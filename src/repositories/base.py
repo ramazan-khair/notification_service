@@ -6,6 +6,7 @@ from sqlalchemy import select, insert, update, delete
 from sqlalchemy.exc import NoResultFound, IntegrityError
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from src.database import Base
 from src.exceptions import ObjectNotFoundException, ObjectAlreadyExistsException
@@ -20,13 +21,13 @@ class BaseRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def get_filtered(self, *filter, **filter_by) -> list[BaseModel | Any]:
-        query = select(self.model).filter(*filter).filter_by(**filter_by)
+    async def get_filtered(self, options: tuple = (), *filter, **filter_by) -> list[BaseModel | Any]:
+        query = select(self.model).filter(*filter).filter_by(**filter_by).options(*options)
         result = await self.session.execute(query)
         return [self.mapper.map_to_domain_entity(model) for model in result.scalars().all()]
 
-    async def get_all(self, *args, **kwargs) -> list[BaseModel | Any]:
-        return await self.get_filtered()
+    async def get_all(self, options: tuple = (), *args, **kwargs) -> list[BaseModel | Any]:
+        return await self.get_filtered(options=options, *args, **kwargs)
 
     async def get_one_or_none(self, **filter_by) -> BaseModel | None | Any:
         query = select(self.model).filter_by(**filter_by)
@@ -35,6 +36,15 @@ class BaseRepository:
         if model is None:
             return None
         return self.mapper.map_to_domain_entity(model)
+
+    async def get_one_orm(self, *options, **filter_by):
+        query = select(self.model).filter_by(**filter_by).options(*options)
+        result = await self.session.execute(query)
+        try:
+            model = result.scalar_one()
+        except NoResultFound:
+            raise ObjectNotFoundException
+        return model
 
     async def get_one(self, **filter_by) -> BaseModel:
         query = select(self.model).filter_by(**filter_by)

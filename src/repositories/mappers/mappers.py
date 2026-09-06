@@ -1,8 +1,8 @@
-from src.models.schedules import Schedule
+from src.models.templates import Template
 from src.repositories.mappers.base import DataMapper
-from src.shemas.schedules import ScheduleAdd
+from src.schemas.templates import TemplateDTO
 
 
-class ScheduleDataMapper(DataMapper):
-    db_model = Schedule
-    schema = ScheduleAdd
+class TemplateDataMapper(DataMapper):
+    model = Template
+    schema = TemplateDTO

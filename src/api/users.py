@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from src.api.dependencies import DBDep
 from src.services.schedules import ScheduleService
-from src.shemas.schedules import ScheduleAdd
+from src.schemas.schedules import ScheduleAdd
 
 router = APIRouter(prefix="/users", tags=["Users"])
 

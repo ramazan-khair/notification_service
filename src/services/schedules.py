@@ -1,5 +1,5 @@
 from src.services.base import BaseService
-from src.shemas.schedules import ScheduleAdd
+from src.schemas.schedules import ScheduleAdd
 
 
 class ScheduleService(BaseService):
