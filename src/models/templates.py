@@ -24,7 +24,6 @@ class TemplateChannel(Base):
     body: Mapped[str]
 
     template: Mapped["Template"] = relationship(back_populates="channels")
-    logs: Mapped[list["NotificationLog"]] = relationship(back_populates="template_channel")
 
 
     __table_args__ = (UniqueConstraint("template_id", "channel", name="uq_template_id_channel"),)

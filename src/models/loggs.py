@@ -11,7 +11,6 @@ from src.models.users import User
 class NotificationLog(Base):
     __tablename__ = "notification_logs"
 
-    template_channel_id: Mapped[int] = mapped_column(ForeignKey("template_channels.id"))
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     status: Mapped[str]
     notification: Mapped[str]

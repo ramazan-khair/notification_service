@@ -15,6 +15,11 @@ class TemplateDTO(TemplateAdd):
 
     model_config = ConfigDict(from_attributes=True)
 
+class TemplateChannelDTO(TemplateChannelAdd):
+    id: int
+
+    model_config = ConfigDict(from_attributes=True)
+
 class TemplatePatch(BaseModel):
     name: str | None = None
     channels: list[TemplateChannelAdd] | None = None

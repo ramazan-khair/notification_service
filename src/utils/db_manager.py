@@ -1,5 +1,5 @@
 from src.repositories.schedules import SchedulesRepository
-from src.repositories.templates import TemplatesRepository
+from src.repositories.templates import TemplatesRepository, TemplateChannelsRepository
 
 
 class DBManager:
@@ -11,6 +11,8 @@ class DBManager:
 
         self.templates = TemplatesRepository(self.session)
         self.schedules = SchedulesRepository(self.session)
+        self.templatechannels = TemplateChannelsRepository(self.session)
+        #self.notifications = NotificationService
 
         return self
 

@@ -3,15 +3,49 @@ from pydantic import BaseModel
 from src.services.base import BaseService
 from jinja2 import Template
 
+import smtplib
+from email.message import EmailMessage
+import httpx
 
-class NotificationService(BaseService):
-    async def send_notification(self, event_id: int, data: BaseModel):
-        template = self.db.templates.get_one(event_id=event_id)
-        notification = Template(template.body).render(**data.model_dump())
-        #send_notification.delay(notification)
-        return notification
 
-    async def send_scheduled_notification(self, user_id: int):
-        schedule = await self.db.schedules.get_one(user_id=user_id)
-        #send_scheduled_notification.delay(schedule)
+class NotificationService:
+    @staticmethod
+    async def send_email(to_email: str, subject: str, message: str):
+        msg = EmailMessage()
+        msg["From"] = EMAIL_FROM
+        msg["To"] = to_email
+        msg["Subject"] = subject
+        msg.set_content(message)
+
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
+            server.starttls()
+            server.login(SMTP_USER, SMTP_PASSWORD)
+            server.send_message(msg)
+
+    @staticmethod
+    async def send_sms(to_sms: str, message: str):
+        client = Client(
+            TWILIO_ACCOUNT_SID,
+            TWILIO_AUTH_TOKEN
+        )
+
+        sms = client.messages.create(
+            body=message,
+            from_=TWILIO_PHONE,
+            to=to_sms
+        )
+
+    @staticmethod
+    async def send_telegram(chat_id: str, message: str):
+        url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                url,
+                json={
+                    "chat_id": chat_id,
+                    "text": message
+                }
+            )
+
 

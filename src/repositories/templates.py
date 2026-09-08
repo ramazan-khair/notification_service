@@ -4,9 +4,13 @@ from sqlalchemy.orm import selectinload, options
 
 from src.models.templates import Template, TemplateChannel
 from src.repositories.base import BaseRepository
-from src.repositories.mappers.mappers import TemplateDataMapper
+from src.repositories.mappers.mappers import TemplateDataMapper, TemplateChannelDataMapper
 from src.schemas.templates import TemplateAdd, TemplateChannelAdd, TemplatePatch
 
+
+class TemplateChannelsRepository(BaseRepository):
+    model = TemplateChannel
+    mapper = TemplateChannelDataMapper
 
 class TemplatesRepository(BaseRepository):
     model = Template
