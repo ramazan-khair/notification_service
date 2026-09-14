@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+from src.models import NotificationLog
 from src.services.base import BaseService
 from jinja2 import Template
 from src.tasks.tasks import send_notification
@@ -10,6 +11,11 @@ import httpx
 
 
 class NotificationService(BaseService):
+
+    async def add_notification_log(self, data: NotificationLog):
+        notificationlog = await self.db.notificationlogs.add(NotificationLog)
+        await self.db.commit()
+        return notificationlog
 
     async def send_notification(self, user_id: int, template_channel_id: int, data: dict[str, str]):
         template_channel = await self.db.templatechannels.get_one(id=template_channel_id)

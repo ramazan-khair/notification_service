@@ -1,14 +1,16 @@
 import asyncio
+from datetime import datetime
 
 from pydantic import BaseModel
 
 from src.database import async_session_maker_null_pool
+from src.schemas.notifications import NotifcationLogAdd
 from src.schemas.templates import TemplateChannelDTO
 from src.schemas.users import UserDTO
 from src.tasks.celery_app import celery_instance
 from src.utils.db_manager import DBManager
 from jinja2 import Template
-from src.services.notifications import NotificationService as ns
+from src.services.notifications import NotificationService as ns, NotificationService
 
 
 async def send_notification_helper(
@@ -16,14 +18,34 @@ async def send_notification_helper(
         user: UserDTO,
         data: dict[str, str]
 ):
+    async with DBManager(session_factory=async_session_maker_null_pool) as db:
         template = Template(template_channel.body)
         result = template.render(**data)
-        if template_channel.channel == "email" and user.email:
-            await ns.send_email(user.email, template_channel.subject, result)
-        elif template_channel.channel == "sms" and user.sms:
-            await ns.send_sms(user.sms, result)
-        elif template_channel.channel == "telegram" and user.telegram:
-            await ns.send_telegram(user.telegram, result)
+        try:
+            dict_channels = {"email": user.email, "sms": user.sms, "telegram": user.telegram}
+            dict_func = {"email": ns.send_email, "sms": ns.send_sms, "telegram": ns.send_telegram}
+            for k, v in dict_channels.items():
+                if template_channel.channel == k and v:
+                    func = dict_func[k]
+                    if k == "email":
+                        await func(v, template_channel.subject, result)
+                    else:
+                        await func(v, result)
+                    notificationlog = NotifcationLogAdd(
+                        user_id=user.id,
+                        status="success",
+                        notification=result,
+                        sent_at=datetime.utcnow(),
+                    )
+                    await NotificationService(db).add_notification_log(notificationlog)
+        except Exception as e:
+            notificationlog = NotifcationLogAdd(
+                user_id=user.id,
+                status="failed",
+                notification=result,
+                error=str(e),
+            )
+            await NotificationService(db).add_notification_log(notificationlog)
 
 @celery_instance.task(name="send_notification")
 def send_notification(template_channel, user, data):

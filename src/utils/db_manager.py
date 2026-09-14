@@ -1,4 +1,6 @@
 from src.repositories.schedules import SchedulesRepository
+
+from src.repositories.notifications import NotificationLogsRepository
 from src.repositories.templates import TemplatesRepository, TemplateChannelsRepository
 from src.repositories.users import UsersRepository
 
@@ -14,6 +16,7 @@ class DBManager:
         self.schedules = SchedulesRepository(self.session)
         self.templatechannels = TemplateChannelsRepository(self.session)
         self.users = UsersRepository(self.session)
+        self.notificationlogs = NotificationLogsRepository(self.session)
         #self.notifications = NotificationService
 
         return self
