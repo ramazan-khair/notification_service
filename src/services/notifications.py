@@ -2,13 +2,25 @@ from pydantic import BaseModel
 
 from src.services.base import BaseService
 from jinja2 import Template
+from src.tasks.tasks import send_notification
 
 import smtplib
 from email.message import EmailMessage
 import httpx
 
 
-class NotificationService:
+class NotificationService(BaseService):
+
+    async def send_notification(self, user_id: int, template_channel_id: int, data: dict[str, str]):
+        template_channel = await self.db.templatechannels.get_one(id=template_channel_id)
+        user = await self.db.users.get_one(id=user_id)
+
+        send_notification.delay(
+            template_channel.model_dump(),
+            user.model_dump(),
+            data
+        )
+
     @staticmethod
     async def send_email(to_email: str, subject: str, message: str):
         msg = EmailMessage()

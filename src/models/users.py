@@ -1,7 +1,11 @@
+import typing
+
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.database import Base
-from src.models.loggs import NotificationLog
+
+if typing.TYPE_CHECKING:
+    from src.models.loggs import NotificationLog
 
 
 class User(Base):

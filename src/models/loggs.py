@@ -1,11 +1,14 @@
+import typing
+
 from datetime import datetime
 
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 from src.database import Base
-from src.models.templates import TemplateChannel
-from src.models.users import User
+if typing.TYPE_CHECKING:
+    from src.models.templates import TemplateChannel
+    from src.models.users import User
 
 
 class NotificationLog(Base):

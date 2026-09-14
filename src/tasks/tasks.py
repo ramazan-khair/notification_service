@@ -3,6 +3,8 @@ import asyncio
 from pydantic import BaseModel
 
 from src.database import async_session_maker_null_pool
+from src.schemas.templates import TemplateChannelDTO
+from src.schemas.users import UserDTO
 from src.tasks.celery_app import celery_instance
 from src.utils.db_manager import DBManager
 from jinja2 import Template
@@ -10,8 +12,8 @@ from src.services.notifications import NotificationService as ns
 
 
 async def send_notification_helper(
-        template_channel: BaseModel,
-        user: BaseModel,
+        template_channel: TemplateChannelDTO,
+        user: UserDTO,
         data: dict[str, str]
 ):
         template = Template(template_channel.body)
@@ -24,5 +26,13 @@ async def send_notification_helper(
             await ns.send_telegram(user.telegram, result)
 
 @celery_instance.task(name="send_notification")
-def send_notification():
-    asyncio.run(send_notification_helper())
+def send_notification(template_channel, user, data):
+    template_channel = TemplateChannelDTO.model_validate(template_channel)
+    user = UserDTO.model_validate(user)
+    asyncio.run(
+        send_notification_helper(
+            template_channel,
+            user,
+            data
+        )
+    )
