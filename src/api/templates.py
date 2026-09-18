@@ -30,13 +30,4 @@ async def delete_template(template_id: int, db: DBDep):
     await TemplateService(db).delete_template(template_id)
     return {"status": "OK"}
 
-"""
-@router.patch("/{template_id}")
-async def partially_edit_template(
-    template_id: int,
-    template_data: TemplatePatch,
-    db: DBDep,
-):
-    await TemplateService(db).edit_template_partially(template_data, template_id, exclude_unset=True)
-    return {"status": "OK"}
-"""
+

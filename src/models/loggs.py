@@ -7,7 +7,6 @@ from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 from src.database import Base
 if typing.TYPE_CHECKING:
-    from src.models.templates import TemplateChannel
     from src.models.users import User
 
 

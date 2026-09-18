@@ -62,27 +62,3 @@ class TemplatesRepository(BaseRepository):
         await self.session.flush()
 
 
-
-""""
-    async def get_template(self, template_id: int):
-        query = (
-            select(Template)
-            .where(Template.id == template_id)
-            .options(
-                selectinload(Template.channels)
-            )
-        )
-        result = await self.session.execute(query)
-        template = result.scalars().one()
-        return self.mapper.map_to_domain_entity(template)
-"""
-#async def add(self, data: TemplateAdd):
-#    query_1 = insert(Template).values(name=data.name).returning(Template)
-#    result_1 = await self.session.execute(query_1)
-#    template = result_1.scalars().one()
-#    dicts = [i.model_dump() for i in data.channels]
-#    for i in dicts:
-#        i["template_id"] = template.id
-#    query_2 = insert(TemplateChannel).values(dicts).returning(TemplateChannel)
-#    result_2 = await self.session.execute(query_2)
-#    return self.mapper.map_to_domain_entity(template)

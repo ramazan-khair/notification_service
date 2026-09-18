@@ -1,3 +1,5 @@
+from firebase_admin import messaging
+
 from src.config import settings
 from src.models import NotificationLog
 from src.services.base import BaseService
@@ -66,5 +68,19 @@ class NotificationService(BaseService):
                     "text": message
                 }
             )
+
+    @staticmethod
+    async def send_push(token: str, title: str, body: str):
+        message = messaging.Message(
+            notification=messaging.Notification(
+                title=title,
+                body=body,
+            ),
+            token=token,
+        )
+
+        response = messaging.send(message)
+
+
 
 

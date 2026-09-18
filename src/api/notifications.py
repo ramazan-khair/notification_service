@@ -2,7 +2,6 @@ from fastapi import APIRouter
 
 from src.api.dependencies import DBDep
 from src.services.notifications import NotificationService
-from src.services.users import UserService
 
 router = APIRouter(prefix="/notifications", tags=["notifications"])
 
