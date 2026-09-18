@@ -7,7 +7,7 @@ from src.services.templates import TemplateService
 router = APIRouter(prefix="/template", tags=["template"])
 
 
-@router.post("")
+@router.get("")
 async def get_templates(db: DBDep):
     return await TemplateService(db).get_templates()
 

@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from sqlalchemy import insert, select, update
-from sqlalchemy.orm import selectinload, options
+from sqlalchemy.orm import selectinload
 
 from src.models.templates import Template, TemplateChannel
 from src.repositories.base import BaseRepository

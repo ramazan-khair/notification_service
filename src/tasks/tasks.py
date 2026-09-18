@@ -22,8 +22,9 @@ async def send_notification_helper(
         template = Template(template_channel.body)
         result = template.render(**data)
         try:
+            sent = False
             dict_channels = {"email": user.email, "sms": user.sms, "telegram": user.telegram}
-            dict_func = {"email": ns.send_email, "sms": ns.send_sms, "telegram": ns.send_telegram}
+            dict_func = {"email": ns.send_email, "sms": ns.send_sms, "telegram": ns.sendпше_telegram}
             for k, v in dict_channels.items():
                 if template_channel.channel == k and v:
                     func = dict_func[k]
@@ -38,10 +39,13 @@ async def send_notification_helper(
                         sent_at=datetime.utcnow(),
                     )
                     await NotificationService(db).add_notification_log(notificationlog)
+                    sent = True
+            if not sent:
+                status = "failed"
         except Exception as e:
             notificationlog = NotifcationLogAdd(
                 user_id=user.id,
-                status="failed",
+                status=status,
                 notification=result,
                 error=str(e),
             )

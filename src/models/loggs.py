@@ -21,4 +21,3 @@ class NotificationLog(Base):
     sent_at: Mapped[datetime] = mapped_column(default=datetime.now)
 
     user: Mapped["User"] = relationship(back_populates="logs")
-    template_channel: Mapped["TemplateChannel"] = relationship(back_populates="logs")

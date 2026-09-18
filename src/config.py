@@ -11,12 +11,21 @@ class Settings(BaseSettings):
     DB_PASS: str
     DB_NAME: str
 
-    #REDIS_HOST: str
-    #REDIS_PORT: int
+    REDIS_HOST: str
+    REDIS_PORT: int
 
-    #@property
-    #def REDIS_URL(self):
-    #    return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}"
+    EMAIL_FROM: str
+
+    SMTP_HOST: str
+    SMTP_PORT: int
+    SMTP_USER: str
+    SMTP_PASSWORD: str
+
+    TELEGRAM_BOT_TOKEN: str
+
+    @property
+    def REDIS_URL(self):
+        return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}"
 
     @property
     def DB_URL(self):

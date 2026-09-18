@@ -8,11 +8,16 @@ class TemplateService(BaseService):
 
     async def add_template(self, template: TemplateAdd):
         result = await self.db.templates.add_template(template)
+
         await self.db.commit()
+
+        check = await self.db.templates.get_template(result.id)
+        print("CHECK AFTER COMMIT:", check)
+
         return result
 
     async def get_templates(self):
-        return await self.db.templates.get_all()
+        return await self.db.templates.get_templates()
 
     async def get_template(self, template_id: int):
         return await self.db.templates.get_template(template_id)

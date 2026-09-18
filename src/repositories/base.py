@@ -9,7 +9,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.database import Base
-from src.exceptions import ObjectNotFoundException, ObjectAlreadyExistsException
+from src.exceptions import ObjectAlreadyExistsException, ObjectNotFoundException
+
 from src.repositories.mappers.base import DataMapper
 
 
@@ -23,8 +24,15 @@ class BaseRepository:
 
     async def get_filtered(self, options: tuple = (), *filter, **filter_by) -> list[BaseModel | Any]:
         query = select(self.model).filter(*filter).filter_by(**filter_by).options(*options)
+        print(query)
         result = await self.session.execute(query)
-        return [self.mapper.map_to_domain_entity(model) for model in result.scalars().all()]
+
+        models = result.scalars().all()
+
+        for model in models:
+            print(model.channels)
+
+        return [self.mapper.map_to_domain_entity(model) for model in models]
 
     async def get_all(self, options: tuple = (), *args, **kwargs) -> list[BaseModel | Any]:
         return await self.get_filtered(options=options, *args, **kwargs)
