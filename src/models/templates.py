@@ -9,6 +9,8 @@ class Template(Base):
     __tablename__ = "templates"
 
     name: Mapped[str] = mapped_column(unique=True)
+    subject: Mapped[str | None]
+    body: Mapped[str]
 
     channels: Mapped[list["TemplateChannel"]] = relationship(
         back_populates="template",
@@ -20,10 +22,7 @@ class TemplateChannel(Base):
 
     template_id: Mapped[int] = mapped_column(ForeignKey("templates.id"))
     channel: Mapped[str]
-    subject: Mapped[str | None]
-    body: Mapped[str]
 
     template: Mapped["Template"] = relationship(back_populates="channels")
-
 
     __table_args__ = (UniqueConstraint("template_id", "channel", name="uq_template_id_channel"),)

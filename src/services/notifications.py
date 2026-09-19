@@ -1,7 +1,7 @@
 from firebase_admin import messaging
 
 from src.config import settings
-from src.models import NotificationLog
+from src.schemas.loggs import LoggAdd
 from src.services.base import BaseService
 
 
@@ -12,21 +12,49 @@ import httpx
 
 class NotificationService(BaseService):
 
-    async def add_notification_log(self, data: NotificationLog):
-        notificationlog = await self.db.notificationlogs.add(data)
+    async def add_notification_log(self, data: LoggAdd):
+        logg = await self.db.loggs.add(data)
         await self.db.commit()
-        return notificationlog
+        return logg
 
-    async def send_notification(self, user_id: int, template_channel_id: int, data: dict[str, str]):
+
+    async def send_notification(
+            self,
+            project_id: int,
+            user_id: int,
+            template_channel_id: int,
+            data: dict[str, str]
+    ):
         from src.tasks.tasks import send_notification
         template_channel = await self.db.templatechannels.get_one(id=template_channel_id)
-        user = await self.db.users.get_one(id=user_id)
+        contact = await self.db.users.get_one(project_id=project_id, user_id=user_id)
 
         send_notification.delay(
             template_channel.model_dump(),
-            user.model_dump(),
+            contact.model_dump(),
             data
         )
+
+
+    async def send_push_notification(
+            self,
+            project_id: int,
+            user_id: int,
+            template_channel_id: int,
+            data: dict[str, str]
+    ):
+        from src.tasks.tasks import send_push_notification
+        template_channel = await self.db.templatechannels.get_one(id=template_channel_id)
+        contact = await self.db.contacts.get_one(project_id=project_id, user_id=user_id)
+        fcm_token = await self.db.devices.get_one(project_id=project_id, user_id=user_id)
+
+        send_push_notification.delay(
+            template_channel.model_dump(),
+            contact.model_dump(),
+            fcm_token,
+            data
+        )
+
 
     @staticmethod
     async def send_email(to_email: str, subject: str, message: str):
@@ -41,6 +69,7 @@ class NotificationService(BaseService):
             server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
             server.send_message(msg)
 
+
     @staticmethod
     async def send_sms(to_sms: str, message: str):
         client = Client(
@@ -53,6 +82,7 @@ class NotificationService(BaseService):
             from_=TWILIO_PHONE,
             to=to_sms
         )
+
 
     @staticmethod
     async def send_telegram(chat_id: str, message: str):
@@ -68,6 +98,7 @@ class NotificationService(BaseService):
                     "text": message
                 }
             )
+
 
     @staticmethod
     async def send_push(token: str, title: str, body: str):

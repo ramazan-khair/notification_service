@@ -1,6 +1,8 @@
-from src.repositories.notifications import NotificationLogsRepository
+from src.repositories.contacts import ContactsRepository
+from src.repositories.loggs import LoggsRepository
+from src.repositories.projects import ProjectsRepository
 from src.repositories.templates import TemplatesRepository, TemplateChannelsRepository
-from src.repositories.users import UsersRepository
+from src.repositories.devices import DevicesRepository
 
 
 class DBManager:
@@ -12,9 +14,10 @@ class DBManager:
 
         self.templates = TemplatesRepository(self.session)
         self.templatechannels = TemplateChannelsRepository(self.session)
-        self.users = UsersRepository(self.session)
-        self.notificationlogs = NotificationLogsRepository(self.session)
-        #self.notifications = NotificationService
+        self.loggs = LoggsRepository(self.session)
+        self.projects = ProjectsRepository(self.session)
+        self.contacts = ContactsRepository(self.session)
+        self.devices = DevicesRepository(self.session)
 
         return self
 

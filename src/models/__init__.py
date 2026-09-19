@@ -1,6 +1,6 @@
 from src.models.templates import TemplateChannel, Template
 from src.models.loggs import NotificationLog
-from src.models.users import User
+from src.models.contacts import User
 
 __all__ = [
     "TemplateChannel",
